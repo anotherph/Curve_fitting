@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from random import sample
 from haversine import haversine
+import argparse
 
 def create_plot(x,y, styles, marker_s,labels, title):
     plt.figure(figsize=(10,6))
@@ -16,7 +17,7 @@ def create_plot(x,y, styles, marker_s,labels, title):
     plt.title(title)
     plt.legend(loc=0)
     
-def getData():
+def getData(num_len):
     # read from google spreadsheets
     # return altitude and cumultive distance calculated from the latitude and londitude
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
@@ -29,8 +30,8 @@ def getData():
     data=worksheet.get_all_values()
     data=np.array(data)
     
-    Neajang=np.arange(1775,1882) # 1775th to 1882th rows contains the metadata of Neajang National park 
-    # Neajang=np.arange(1775,1775+50)
+    # Neajang=np.arange(1775,1882) # 1775th to 1882th rows contains the metadata of Neajang National park 
+    Neajang=np.arange(1775,1775+num_len)
     al=data[Neajang,11] # '11' means column L
     al=al.astype(np.float64)
     
@@ -45,23 +46,27 @@ def getData():
     dist=np.cumsum(dist)
     return al, dist
 
-if __name__ == "__main__":
+def runMain(args):
+    # get metadata
+    num_len = args.num_len
+    y_ori, x_ori = getData(num_len) # y means altitude, x means cumlitive distance (km)
     
-    # get metadata 
-    y_ori, x_ori = getData() # y means altitude, x means cumlitive distance (km)
-    
-    # choose altidue randomly
-    choice=0 # 1 means that we only use a portion of the data, 0 means that we use all data
-    num=8 # the number of samples
+    # select data
+    choice=args.ch 
+    num=args.ch_num # the number of samples
     if choice == 1:
-        ind=sample(range(0,len(y_ori)),num);ind.sort()
+        ind=sample(range(1,len(y_ori)-2),num-2);ind.sort()
+        ind.insert(0,0); ind.append(len(y_ori)-1)
+    elif choice == 2:
+        ind=np.linspace(0,len(y_ori)-1,num); ind=ind.astype(np.int32)
     else:
-        ind=range(0,len(y_ori)) 
+        ind=range(0,len(y_ori)-1) 
     y=y_ori[ind]; x=x_ori[ind]
+    x_n=np.linspace(0,x_ori[-1],len(y_ori)*2)
     
     # spline interpolation
-    ipo = spi.splrep(x,y,k=1) # make cubic spline (k=3)
-    iy = spi.splev(x_ori,ipo)
+    ipo = spi.splrep(x,y,k=3) # make cubic spline (k=3)
+    iy=spi.splev(x_n,ipo,der=0)
     
     # curve fitting
     # quadratic polynomial (order 2)
@@ -69,13 +74,20 @@ if __name__ == "__main__":
         return a*x**2+b*x+c 
     popt, pcov =curve_fit(func,x,y)
 
-    # # evaluate(True or False)
-    # print(np.allclose(y,iy))
-
     # plot the graph
-    create_plot([x_ori,x_ori,x],[y_ori,iy,y],['bo','r-','y*'],
+    create_plot([x_ori,x_n,x],[y_ori,iy,y],['bo','r-','y*'],
                 [3,3,10],['value','interpolation','selected'],'spline interpolation')
     create_plot([x_ori,x_ori,x],[y_ori,func(x_ori,*popt),y],['bo','r-','y*'],
                 [3,3,10],['value','curve_fitting','selected'],'curve_fitting (2nd order of poly)')
     plt.show()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num_len', type=int, default=100, help='the length of data')
+    parser.add_argument('--ch', type=int, default=2, help='1:select ch_num values randomly, 2:select ch_num values evenly, 3: use full dataset' )
+    parser.add_argument('--ch_num', type=int, default=50, help='# the number of selected samples randomly' )
+    args=parser.parse_args()
+    runMain(args)
+    
+    
     
