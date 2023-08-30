@@ -1,3 +1,5 @@
+## spline interpolation and curve fitting using entire data
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import scipy.interpolate as spi
