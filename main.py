@@ -18,6 +18,7 @@ def create_plot(x,y, styles, marker_s,labels, title):
     plt.ylabel('altitude (m)')
     plt.title(title)
     plt.legend(loc=0)
+    plt.ylim(150,1000)
     
 def getData(num_len):
     # read from google spreadsheets
@@ -77,17 +78,17 @@ def runMain(args):
     popt, pcov =curve_fit(func,x,y)
 
     # plot the graph
-    create_plot([x_ori,x_n,x],[y_ori,iy,y],['bo','r-','y*'],
-                [3,3,10],['value','interpolation','selected'],'spline interpolation')
-    create_plot([x_ori,x_ori,x],[y_ori,func(x_ori,*popt),y],['bo','r-','y*'],
-                [3,3,10],['value','curve_fitting','selected'],'curve_fitting (2nd order of poly)')
+    create_plot([x_ori,x_n,x],[y_ori,iy,y],['bo','r-s','y*'],
+                [3,5,10],['value','interpolation','selected'],'spline interpolation')
+    create_plot([x_ori,x_ori,x],[y_ori,func(x_ori,*popt),y],['bo','r-s','y*'],
+                [3,5,10],['value','curve_fitting','selected'],'curve_fitting (2nd order of poly)')
     plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_len', type=int, default=100, help='the length of data')
     parser.add_argument('--ch', type=int, default=2, help='1:select ch_num values randomly, 2:select ch_num values evenly, 3: use full dataset' )
-    parser.add_argument('--ch_num', type=int, default=50, help='# the number of selected samples randomly' )
+    parser.add_argument('--ch_num', type=int, default=50, help='# the number of selected samples ' )
     args=parser.parse_args()
     runMain(args)
     

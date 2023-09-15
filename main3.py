@@ -19,6 +19,7 @@ def create_plot(x,y, styles, marker_s,labels, title):
     plt.ylabel('altitude (m)')
     plt.title(title)
     plt.legend(loc=0)
+    plt.ylim(150,1000)
         
 def getData(num_len):
     # read from google spreadsheets
@@ -71,7 +72,10 @@ def runMain(args):
     x_t=[]; y_t=[]; x_s=[]; y_s=[]; y_p=[]; y_e=[]
     
     def run_plot(): # we need this def to use drawnow function
-        create_plot([x_ori,x_t,x_s],[y_ori,y_t,y_s],['bo','r-','y*'],[3,3,10],['value','interpolation','selected'],'spline interpolation')
+        if args.me == 0: 
+            create_plot([x_ori,x_t,x_s],[y_ori,y_t,y_s],['bo','r-s','y*'],[3,5,10],['value','interpolation','selected'],'spline interpolation')
+        elif args.me == 1:
+            create_plot([x_ori,x_t,x_s],[y_ori,y_t,y_s],['bo','r-s','y*'],[3,5,10],['value','interpolation','selected'],'curve fitting')
           
     ind_t=np.linspace(0,len(y_ori)-2,num); ind_t=ind_t.astype(np.int32)
     
@@ -128,7 +132,7 @@ if __name__ == "__main__":
     parser.add_argument('--intav', type=int, default=2, help='the intervals of dataset')
     parser.add_argument('--num_p', type=int, default=4, help='the number of data to predict next value')
     parser.add_argument('--me', type=int, default=1, help='interpolation method, 0:spline (cubic), 1:curve-fitting (2nd order poly)')
-    parser.add_argument('--sh', type=int, default=5, help='show cumultive gragh (0), show nth instance (n)')
+    parser.add_argument('--sh', type=int, default=0, help='show cumultive gragh (0), show nth instance (n)')
     args=parser.parse_args()
     runMain(args)
     
