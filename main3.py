@@ -13,13 +13,14 @@ from haversine import haversine
 import argparse
 
 def create_plot(x,y, styles, marker_s,labels, title):
+    plt.figure(figsize=(10,6))
     for i in range(len(x)):
         plt.plot(x[i],y[i],styles[i],markersize=marker_s[i],label=labels[i])
     plt.xlabel('cumulitive distance (km)')
     plt.ylabel('altitude (m)')
     plt.title(title)
     plt.legend(loc=0)
-    plt.ylim(150,1000)
+    plt.ylim(0,1000)
         
 def getData(num_len):
     # read from google spreadsheets
@@ -79,7 +80,7 @@ def runMain(args):
           
     ind_t=np.linspace(0,len(y_ori)-2,num); ind_t=ind_t.astype(np.int32)
     
-    fig = plt.figure(1)
+    # fig = plt.figure(1)
 
     for ix in range(num):
         temp=ind_t[ix:ix+num_p] # index to be applied 
@@ -98,7 +99,7 @@ def runMain(args):
             x_n=x[temp_p]
             iy=func(x_n,*popt)
         
-        if args.sh == 0:
+        if args.sty == 0:
             # draw the trace
             if ix==0:
                 x_t=np.append(x_t,x_n)
@@ -113,7 +114,7 @@ def runMain(args):
                 x_s=np.append(x_s,x[temp[-1]])
                 y_s=np.append(y_s,y[temp[-1]])
                 y_e=np.append(y_e,np.abs(y[temp[-1]]-y_t[-2])) # y[temp[-1]] - measurement , y_t[-2] - prediction
-        else:
+        elif args.sty == 1:
             # draw the instance
             x_t=x_n
             y_t=iy
@@ -129,10 +130,11 @@ def runMain(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_len', type=int, default=100, help='the number of total data')
-    parser.add_argument('--intav', type=int, default=2, help='the intervals of dataset')
-    parser.add_argument('--num_p', type=int, default=4, help='the number of data to predict next value')
+    parser.add_argument('--intav', type=int, default=4, help='the intervals of dataset')
+    parser.add_argument('--num_p', type=int, default=8, help='the number of data to predict next value')
     parser.add_argument('--me', type=int, default=1, help='interpolation method, 0:spline (cubic), 1:curve-fitting (2nd order poly)')
-    parser.add_argument('--sh', type=int, default=0, help='show cumultive gragh (0), show nth instance (n)')
+    parser.add_argument('--sty', type=int, default=0, help='show cumultive gragh (0), show instance (1)')
+    parser.add_argument('--sh', type=int, default=0, help='show nth instance (n)')
     args=parser.parse_args()
     runMain(args)
     
