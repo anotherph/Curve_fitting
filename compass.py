@@ -1,6 +1,11 @@
-# calculate the azimuth of the normal vector which is orthgonal to two GPS points
-# we assume that the earth is plane; it make sense because the two GPS points are so close (< 1 m) enough to ignore the curvature of the earth
-# if you assume that the earth is sphere, refer to here: https://spiralmoon.tistory.com/entry/Algorithm-%EC%A7%80%EA%B5%AC%EC%97%90%EC%84%9C-%EB%91%90-%EC%A0%90-%EC%82%AC%EC%9D%B4%EC%9D%98-%EB%B0%A9%EC%9C%84%EA%B0%81-%EA%B5%AC%ED%95%98%EA%B8%B0
+### about this code ### 
+# calculate the azimuth of the normal vector which is orthgonal to a vector specified by two GPS points
+# we assume that the earth is plane; it make sense because the two GPS points are so close (< 1 m) that we can ignore the curvature of the earth
+# in case that the earth assumed to be sphere, refer to here: https://spiralmoon.tistory.com/entry/Algorithm-%EC%A7%80%EA%B5%AC%EC%97%90%EC%84%9C-%EB%91%90-%EC%A0%90-%EC%82%AC%EC%9D%B4%EC%9D%98-%EB%B0%A9%EC%9C%84%EA%B0%81-%EA%B5%AC%ED%95%98%EA%B8%B0
+
+### comments ###
+# add the normal vector in visualization
+# it need to be transfomed to nodejs code
 
 import numpy as np
 import math

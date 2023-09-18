@@ -125,8 +125,8 @@ def runMain(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_len', type=int, default=100, help='the length of data')
-    parser.add_argument('--intav', type=int, default=2, help='the intervals of dataset') 
-    parser.add_argument('--num_p', type=int, default=4, help='the number of data to fit the model')
+    parser.add_argument('--intav', type=int, default=4, help='the intervals of dataset') 
+    parser.add_argument('--num_p', type=int, default=8, help='the number of data to fit the model')
     parser.add_argument('--me', type=int, default=1, help='interpolation method, 0:spline (cubic), 1:curve-fitting (2nd order poly)')
     parser.add_argument('--sh', type=int, default=0, help='show cumultive gragh (0), show nth instance (n)')
     args=parser.parse_args()

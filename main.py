@@ -18,9 +18,9 @@ def create_plot(x,y, styles, marker_s,labels, title):
     plt.ylabel('altitude (m)')
     plt.title(title)
     plt.legend(loc=0)
-    plt.ylim(150,1000)
+    plt.ylim(0,1000)
     
-def getData(num_len):
+def getData(st, num_len):
     # read from google spreadsheets
     # return altitude and cumultive distance calculated from the latitude and londitude
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
@@ -34,7 +34,7 @@ def getData(num_len):
     data=np.array(data)
     
     # Neajang=np.arange(1775,1882) # 1775th to 1882th rows contains the metadata of Neajang National park 
-    Neajang=np.arange(1775,1775+num_len)
+    Neajang=np.arange(1775+st,1775+st+num_len)
     al=data[Neajang,11] # '11' means column L
     al=al.astype(np.float64)
     
@@ -51,8 +51,9 @@ def getData(num_len):
 
 def runMain(args):
     # get metadata
+    st=args.st
     num_len = args.num_len
-    y_ori, x_ori = getData(num_len) # y means altitude, x means cumlitive distance (km)
+    y_ori, x_ori = getData(st, num_len) # y means altitude, x means cumlitive distance (km)
     
     # select data
     choice=args.ch 
@@ -65,7 +66,7 @@ def runMain(args):
     else:
         ind=range(0,len(y_ori)-1) 
     y=y_ori[ind]; x=x_ori[ind]
-    x_n=np.linspace(0,x_ori[-1],len(y_ori)*2)
+    x_n=np.linspace(0,x_ori[-1],len(y_ori)*5)
     
     # spline interpolation
     ipo = spi.splrep(x,y,k=3) # make cubic spline (k=3)
@@ -78,17 +79,20 @@ def runMain(args):
     popt, pcov =curve_fit(func,x,y)
 
     # plot the graph
-    create_plot([x_ori,x_n,x],[y_ori,iy,y],['bo','r-s','y*'],
+    create_plot([x_ori,x_n,x],[y_ori,iy,y],['bo','r-','y*'],
                 [3,5,10],['value','interpolation','selected'],'spline interpolation')
-    create_plot([x_ori,x_ori,x],[y_ori,func(x_ori,*popt),y],['bo','r-s','y*'],
-                [3,5,10],['value','curve_fitting','selected'],'curve_fitting (2nd order of poly)')
+    # create_plot([x_ori,x_ori,x],[y_ori,func(x_ori,*popt),y],['bo','r-s','y*'],
+                # [3,5,10],['value','curve_fitting','selected'],'curve_fitting (2nd order of poly)')
+    create_plot([x_ori,x_n,x],[y_ori,func(x_n,*popt),y],['bo','r-','y*'],
+                [3,5,10],['value','curve_fitting','selected'],'curve_fitting (2nd order of polynomial)')
     plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('--st', type=int, default=0, help='the start point of data') # the total number of data is 100; if st+num_len >100, error comes up
     parser.add_argument('--num_len', type=int, default=100, help='the length of data')
     parser.add_argument('--ch', type=int, default=2, help='1:select ch_num values randomly, 2:select ch_num values evenly, 3: use full dataset' )
-    parser.add_argument('--ch_num', type=int, default=50, help='# the number of selected samples ' )
+    parser.add_argument('--ch_num', type=int, default=10, help='# the number of selected samples ' )
     args=parser.parse_args()
     runMain(args)
     
