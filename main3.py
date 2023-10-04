@@ -133,8 +133,8 @@ if __name__ == "__main__":
     parser.add_argument('--intav', type=int, default=4, help='the intervals of dataset')
     parser.add_argument('--num_p', type=int, default=8, help='the number of data to predict next value')
     parser.add_argument('--me', type=int, default=1, help='interpolation method, 0:spline (cubic), 1:curve-fitting (2nd order poly)')
-    parser.add_argument('--sty', type=int, default=0, help='show cumultive gragh (0), show instance (1)')
-    parser.add_argument('--sh', type=int, default=0, help='show nth instance (n)')
+    parser.add_argument('--sty', type=int, default=1, help='show cumultive gragh (0), show instance (1)')
+    parser.add_argument('--sh', type=int, default=2, help='show nth instance (n)')
     args=parser.parse_args()
     runMain(args)
     
