@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import *
 
 import matplotlib
 matplotlib.use('Qt5Agg')
+# matplotlib.use('tkAgg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
@@ -148,17 +149,41 @@ class Main(QDialog):
         self.runMain()
 
     def set_graph1(self, item):
-        self.st = int(item)
+        # self.st = int(item)
+        try:
+            self.st = int(item)
+        except ValueError:
+            pass
+        else:
+            pass
         
     def set_graph2(self, item):
-        self.en = int(item)
+        # self.en = int(item)
+        try:
+            self.en = int(item)
+        except ValueError:
+            pass
+        else:
+            pass
         
     def set_graph3(self, item):
-        self.num = int(item)   
+        # self.num = int(item)   
+        try:
+            self.num = int(item)
+        except ValueError:
+            pass
+        else:
+            pass
     
     def set_graph4(self, item):
         global offset
-        offset = int(item)   
+        # offset = int(item)   
+        try:
+            offset = int(item)
+        except ValueError:
+            pass
+        else:
+            pass
 
     def create_plot(self):
         self.win_2()
