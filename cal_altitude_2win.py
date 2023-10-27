@@ -50,6 +50,7 @@ class second(QDialog):
         self.setLayout(layout)
         self.show()
         # self.setFixedSize(1000,1200)
+        # do something!!
         
         self.sc.axes1.cla()
         self.sc.axes2.cla()
