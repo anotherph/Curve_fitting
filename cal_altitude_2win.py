@@ -16,7 +16,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationTool
 from matplotlib.figure import Figure
 
 import gspread
-# from oauth2client.service_account import ServiceAccountCredentials
 import scipy.interpolate as spi
 from scipy.optimize import curve_fit
 from matplotlib import pyplot as plt
@@ -29,24 +28,64 @@ class MplCanvas(FigureCanvasQTAgg):
         fig = Figure()
         self.axes1 = fig.add_subplot(211)
         self.axes2 = fig.add_subplot(212)
-        # fig.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.1, hspace=0.35)
         fig.subplots_adjust(left=0.1, bottom=0.05, right=0.95, top=0.95, wspace=0.05, hspace=0.25)
         fig.set_size_inches(10,20)
         super(MplCanvas, self).__init__(fig)
+        
+class second(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.init_ui() # set UI
+        self.setWindowTitle("graph")
+        self.setGeometry(500,100,1000,1300)
+        
+    def init_ui(self):
+        self.sc = MplCanvas()
+        toolbar = NavigationToolbar(self.sc, self)
+
+        layout = QVBoxLayout()
+        layout.addWidget(toolbar)
+        layout.addWidget(self.sc)
+        
+        self.setLayout(layout)
+        self.show()
+        # self.setFixedSize(1000,1200)
+        
+        self.sc.axes1.cla()
+        self.sc.axes2.cla()
+        x1=[x_ori,x_n,x_n,x]
+        y1=[y_ori,iy,iy+offset,y]
+        x2=[x_ori,x_n,x_n,x]
+        y2=[y_ori,iy_cf,iy_cf+offset,y]
+        styles=['bo','r-.','r-','y*']
+        marker_s=[3,3,5,10]
+        labels1=['data','fit','fit+offset','selected']
+        labels2=['data','fit','fit+offset','selected']
+        for i in range(len(x1)):
+            self.sc.axes1.plot(x1[i],y1[i],styles[i],markersize=marker_s[i],label=labels1[i])
+            self.sc.axes2.plot(x2[i],y2[i],styles[i],markersize=marker_s[i],label=labels2[i])
+        self.sc.axes1.set_xlabel('cumulitive distance (km)')
+        self.sc.axes1.set_ylabel('altitude (m)')
+        self.sc.axes1.set_title('spline interpolation')
+        self.sc.axes1.legend()
+        self.sc.axes1.grid()
+        self.sc.axes2.set_xlabel('cumulitive distance (km)')
+        self.sc.axes2.set_ylabel('altitude (m)')
+        self.sc.axes2.set_title('curve_fitting (2nd order of polynomial)')
+        self.sc.axes2.legend()
+        self.sc.axes2.grid()  
+        self.sc.draw()
 
 class Main(QDialog):
     def __init__(self):
         super().__init__()
         self.init_ui() # set UI
         self.setWindowTitle("주행고도")
-        self.setGeometry(500,100,1000,1300)
-        # self.setFixedSize(1000,1200)
+        # self.setGeometry(500,100,1000,1300)
         
     ############ UI setting ############    
 
     def init_ui(self):
-        self.sc = MplCanvas()
-        toolbar = NavigationToolbar(self.sc, self)
         
         btn1 = QPushButton("load .CSV File",self)
         btn1.clicked.connect(self.btn_fun_FileLoad)
@@ -75,11 +114,8 @@ class Main(QDialog):
         
         textedit4 = QLineEdit(self)
         textedit4.textChanged.connect(self.set_graph4)
-        # textedit4.returnPressed.connect(self.button_clicked)
 
         layout = QVBoxLayout()
-        layout.addWidget(toolbar)
-        layout.addWidget(self.sc)
         layout.addWidget(btn1)
         layout.addWidget(self.combobox_r1)
         layout.addWidget(self.combobox_r2)
@@ -120,33 +156,15 @@ class Main(QDialog):
         self.num = int(item)   
     
     def set_graph4(self, item):
-        self.offset = int(item)   
+        global offset
+        offset = int(item)   
 
     def create_plot(self):
-        self.sc.axes1.cla()
-        self.sc.axes2.cla()
-        x1=[self.x_ori,self.x_n,self.x_n,self.x]
-        y1=[self.y_ori,self.iy,self.iy+self.offset,self.y]
-        x2=[self.x_ori,self.x_n,self.x_n,self.x]
-        y2=[self.y_ori,self.iy_cf,self.iy_cf+self.offset,self.y]
-        styles=['bo','r-.','r-','y*']
-        marker_s=[3,3,5,10]
-        labels1=['data','fit','fit+offset','selected']
-        labels2=['data','fit','fit+offset','selected']
-        for i in range(len(x1)):
-            self.sc.axes1.plot(x1[i],y1[i],styles[i],markersize=marker_s[i],label=labels1[i])
-            self.sc.axes2.plot(x2[i],y2[i],styles[i],markersize=marker_s[i],label=labels2[i])
-        self.sc.axes1.set_xlabel('cumulitive distance (km)')
-        self.sc.axes1.set_ylabel('altitude (m)')
-        self.sc.axes1.set_title('spline interpolation')
-        self.sc.axes1.legend()
-        self.sc.axes1.grid()
-        self.sc.axes2.set_xlabel('cumulitive distance (km)')
-        self.sc.axes2.set_ylabel('altitude (m)')
-        self.sc.axes2.set_title('curve_fitting (2nd order of polynomial)')
-        self.sc.axes2.legend()
-        self.sc.axes2.grid()  
-        self.sc.draw()
+        self.win_2()
+    
+    def win_2(self):
+        window_2=second()
+        window_2.exec_()
     
     def loadData(self,str_dir):
         self.Data=np.empty((0,3))
@@ -172,28 +190,27 @@ class Main(QDialog):
         # get metadata
         st=self.st
         self.num_len = self.en-self.st+1
+        global y_ori, x_ori
         y_ori, x_ori = self.getData() # y means altitude, x means cumlitive distance (km)
         
         # select data
         ind=np.linspace(0,len(y_ori)-1,self.num); ind=ind.astype(np.int32)
+        global y, x, x_n
         y=y_ori[ind]; x=x_ori[ind]
         x_n=np.linspace(0,x_ori[-1],len(y_ori)*5)
         
         # spline interpolation
+        global ipo, iy
         ipo = spi.splrep(x,y,k=3) # make cubic spline (k=3)
         iy=spi.splev(x_n,ipo,der=0)
         
         # curve fitting
         # quadratic polynomial (order 2)
         def func(x,a,b,c):
-            return a*x**2+b*x+c 
+            return a*x**2+b*x+c
+        global popt, pcov, iy_cf
         popt, pcov =curve_fit(func,x,y)
         iy_cf=func(x_n,*popt)
-        
-        self.x_ori=x_ori;self.y_ori=y_ori
-        self.x_n=x_n
-        self.x=x;self.y=y
-        self.iy=iy;self.iy_cf=iy_cf
         
         self.create_plot()
 
