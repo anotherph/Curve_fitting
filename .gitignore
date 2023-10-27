@@ -1,9 +1,7 @@
-test.py
 test1.py
-test2.py
-test3.py
-test4.py
-test5.py
-test6.py
-stop_watch.py
+main.py
+main2.py
+main3.py
+cal_altitude_t.py
+compass.py
 main-analog-396807-a46944180f2f.json
