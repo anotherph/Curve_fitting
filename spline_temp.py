@@ -25,10 +25,10 @@ def loadData(str_dir):
 #     dist = np.linspace(0,10,len(al))
 #     return al, dist
 
-def runMain(args):
+def runMain():
     # get metadata
-    # dir = "info_national_park.csv"
-    dir = f"{args.sheetName}"
+    dir = "info_national_park.csv"
+    # dir = f"{args.sheetName}"
     st=loadData(dir)
     # num_len = len(st)+1
     global y_ori, x_ori
@@ -46,7 +46,7 @@ def runMain(args):
     iy=spi.splev(x_n,ipo,der=0)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument('--sheetName', type=str, required=True, help='Your name')
-    args = parser.parse_args()
-    runMain(args)
+    # parser = argparse.ArgumentParser(description="Process some integers.")
+    # parser.add_argument('--sheetName', type=str, required=True, help='Your name')
+    # args = parser.parse_args()
+    runMain()
